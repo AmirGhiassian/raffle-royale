@@ -45,7 +45,7 @@ const ConfettiPiece = ({
   };
 
   // This inner div handles the fluttering and rotating animation
-  const innerStyle: React.CSSProperties = {
+  const innerStyle: React.CSSProperties & { [key: string]: string | number } = {
     width: `${width}px`,
     height: `${height}px`,
     backgroundColor: color,
