@@ -1,22 +1,54 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 
-// Confetti Piece Component
-const ConfettiPiece = ({ x, y, color, width, height, animationDelay }) => {
+// Define the types for our data structures
+type Participant = {
+  name: string;
+  tickets: number;
+};
+
+type ConfettiPieceData = {
+  id: number;
+  x: number;
+  y: number;
+  color: string;
+  width: number;
+  height: number;
+  animationDelay: number;
+};
+
+// Define the types for the component's props
+type ConfettiPieceProps = {
+  x: number;
+  y: number;
+  color: string;
+  width: number;
+  height: number;
+  animationDelay: number;
+};
+
+// Confetti Piece Component with TypeScript props
+const ConfettiPiece = ({
+  x,
+  y,
+  color,
+  width,
+  height,
+  animationDelay,
+}: ConfettiPieceProps) => {
   // This outer div handles the vertical falling motion and horizontal drift
-  const outerStyle = {
+  const outerStyle: React.CSSProperties = {
     position: "absolute",
     left: `${x}px`,
     top: `${y}px`,
-    transition: "top 5s ease-in, left 4s ease-out", // Slower fall and added horizontal movement
+    transition: "top 5s ease-in, left 4s ease-out",
   };
 
   // This inner div handles the fluttering and rotating animation
-  const innerStyle = {
+  const innerStyle: React.CSSProperties = {
     width: `${width}px`,
     height: `${height}px`,
     backgroundColor: color,
-    // CSS variables are used to randomize the animation for each piece
     "--flutter-rotate-y-end": `${720 + Math.random() * 360}deg`,
     "--flutter-rotate-x-end": `${360 + Math.random() * 360}deg`,
     "--flutter-duration": `${1.5 + Math.random() * 1}s`,
@@ -33,26 +65,26 @@ const ConfettiPiece = ({ x, y, color, width, height, animationDelay }) => {
 
 // Main App Component
 export default function Home() {
-  const [participants, setParticipants] = useState([
+  const [participants, setParticipants] = useState<Participant[]>([
     { name: "Alice", tickets: 2 },
     { name: "Bob", tickets: 1 },
     { name: "Charlie", tickets: 5 },
   ]);
   const [newName, setNewName] = useState("");
   const [newTickets, setNewTickets] = useState(1);
-  const [winner, setWinner] = useState(null);
+  const [winner, setWinner] = useState<string | null>(null);
   const [isRaffling, setIsRaffling] = useState(false);
   const [shufflingName, setShufflingName] = useState("");
   const [showConfetti, setShowConfetti] = useState(false);
-  const [confettiPieces, setConfettiPieces] = useState([]);
+  const [confettiPieces, setConfettiPieces] = useState<ConfettiPieceData[]>([]);
 
-  const winnerRef = useRef(null);
-  const fileInputRef = useRef(null);
+  const winnerRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Refs for Tone.js sound objects
-  const drumSynth = useRef(null);
-  const winnerSynth = useRef(null);
-  const drumLoop = useRef(null);
+  // Refs for Tone.js sound objects (using 'any' as it's a CDN script)
+  const drumSynth = useRef<any>(null);
+  const winnerSynth = useRef<any>(null);
+  const drumLoop = useRef<any>(null);
 
   // Effect to load Tone.js and initialize synths
   useEffect(() => {
@@ -60,21 +92,24 @@ export default function Home() {
     script.src = "https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js";
     script.async = true;
     script.onload = () => {
-      // Initialize synths once Tone.js is loaded
-      drumSynth.current = new window.Tone.MembraneSynth().toDestination();
-      winnerSynth.current = new window.Tone.PolySynth(
-        window.Tone.Synth,
-      ).toDestination();
+      const Tone = (window as any).Tone;
+      if (Tone) {
+        drumSynth.current = new Tone.MembraneSynth().toDestination();
+        winnerSynth.current = new Tone.PolySynth(Tone.Synth).toDestination();
+      }
     };
     document.body.appendChild(script);
 
     // Cleanup script on component unmount
     return () => {
-      if (window.Tone && window.Tone.Transport.state === "started") {
-        window.Tone.Transport.stop();
-        window.Tone.Transport.cancel();
+      const Tone = (window as any).Tone;
+      if (Tone && Tone.Transport.state === "started") {
+        Tone.Transport.stop();
+        Tone.Transport.cancel();
       }
-      document.body.removeChild(script);
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
     };
   }, []);
 
@@ -84,31 +119,37 @@ export default function Home() {
     }
   }, [winner]);
 
-  const addParticipant = (e) => {
+  const addParticipant = (e: React.FormEvent) => {
     e.preventDefault();
     if (newName.trim() && newTickets > 0) {
       setParticipants([
         ...participants,
-        { name: newName.trim(), tickets: parseInt(newTickets, 10) },
+        { name: newName.trim(), tickets: parseInt(String(newTickets), 10) },
       ]);
       setNewName("");
       setNewTickets(1);
     }
   };
 
-  const removeParticipant = (index) => {
+  const removeParticipant = (index: number) => {
     const newParticipants = [...participants];
     newParticipants.splice(index, 1);
     setParticipants(newParticipants);
   };
 
   const startRaffle = async () => {
-    if (participants.length === 0 || !drumSynth.current || !winnerSynth.current)
+    const Tone = (window as any).Tone;
+    if (
+      participants.length === 0 ||
+      !drumSynth.current ||
+      !winnerSynth.current ||
+      !Tone
+    )
       return;
 
     // Start audio context
-    if (window.Tone.context.state !== "running") {
-      await window.Tone.start();
+    if (Tone.context.state !== "running") {
+      await Tone.start();
     }
 
     setIsRaffling(true);
@@ -117,10 +158,10 @@ export default function Home() {
     setConfettiPieces([]);
 
     // Start drum roll sound
-    drumLoop.current = new window.Tone.Loop((time) => {
+    drumLoop.current = new Tone.Loop((time: number) => {
       drumSynth.current.triggerAttackRelease("C2", "16n", time);
     }, "16n").start(0);
-    window.Tone.Transport.start();
+    Tone.Transport.start();
 
     const allTickets = participants.flatMap((p) =>
       Array(p.tickets).fill(p.name),
@@ -141,11 +182,10 @@ export default function Home() {
       if (shuffleCount > maxShuffles) {
         clearInterval(shuffleInterval);
 
-        // Stop drum roll
         if (drumLoop.current) {
           drumLoop.current.stop();
-          window.Tone.Transport.stop();
-          window.Tone.Transport.cancel();
+          Tone.Transport.stop();
+          Tone.Transport.cancel();
         }
 
         const finalWinnerIndex = Math.floor(Math.random() * allTickets.length);
@@ -155,8 +195,7 @@ export default function Home() {
         setIsRaffling(false);
         triggerConfetti();
 
-        // Play winner sound
-        const now = window.Tone.now();
+        const now = Tone.now();
         winnerSynth.current.triggerAttackRelease(["C4", "E4", "G4"], "8n", now);
         winnerSynth.current.triggerAttackRelease(
           ["G4", "B4", "D5"],
@@ -174,15 +213,17 @@ export default function Home() {
 
   const triggerConfetti = () => {
     setShowConfetti(true);
-    const newPieces = Array.from({ length: 200 }).map(() => ({
-      x: Math.random() * window.innerWidth,
-      y: -20,
-      width: 8 + Math.random() * 8,
-      height: 5 + Math.random() * 5,
-      color: `hsl(${Math.random() * 360}, 90%, 60%)`,
-      id: Math.random(),
-      animationDelay: Math.random() * 4,
-    }));
+    const newPieces: ConfettiPieceData[] = Array.from({ length: 200 }).map(
+      () => ({
+        id: Math.random(),
+        x: Math.random() * window.innerWidth,
+        y: -20,
+        width: 8 + Math.random() * 8,
+        height: 5 + Math.random() * 5,
+        color: `hsl(${Math.random() * 360}, 90%, 60%)`,
+        animationDelay: Math.random() * 4,
+      }),
+    );
     setConfettiPieces(newPieces);
 
     setTimeout(() => {
@@ -190,7 +231,6 @@ export default function Home() {
         pieces.map((p) => ({
           ...p,
           y: window.innerHeight + 20,
-          // Add horizontal drift for a spreading effect
           x: p.x + (Math.random() - 0.5) * 300,
         })),
       );
@@ -202,15 +242,15 @@ export default function Home() {
     }, 6000);
   };
 
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
-        const text = e.target.result;
-        const newParticipants = text
+        const text = e.target?.result as string;
+        const newParticipants: Participant[] = text
           .split("\n")
           .map((row) => {
             const columns = row.split(",");
@@ -224,17 +264,15 @@ export default function Home() {
             }
             return null;
           })
-          .filter(Boolean); // Filter out any null/invalid rows
+          .filter((p): p is Participant => p !== null);
 
         setParticipants((prev) => [...prev, ...newParticipants]);
       } catch (error) {
         console.error("Error parsing CSV file:", error);
-        // You could show an error message to the user here
       }
     };
     reader.readAsText(file);
-    // Clear the file input value so the same file can be uploaded again
-    event.target.value = null;
+    event.target.value = "";
   };
 
   const getTotalTickets = () => {
@@ -287,7 +325,7 @@ export default function Home() {
                   <input
                     type="number"
                     value={newTickets}
-                    onChange={(e) => setNewTickets(e.target.value)}
+                    onChange={(e) => setNewTickets(Number(e.target.value))}
                     min="1"
                     className="bg-gray-700 text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
                     required
@@ -311,7 +349,7 @@ export default function Home() {
                   className="hidden"
                 />
                 <button
-                  onClick={() => fileInputRef.current.click()}
+                  onClick={() => fileInputRef.current?.click()}
                   className="w-full bg-gray-700 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-600 transition-colors flex items-center justify-center gap-2"
                 >
                   <svg
@@ -341,7 +379,7 @@ export default function Home() {
                   <ul className="space-y-2">
                     {participants.map((p, i) => (
                       <li
-                        key={i}
+                        key={`${p.name}-${i}`}
                         className="flex justify-between items-center bg-gray-700 p-3 rounded-lg animate-fade-in"
                       >
                         <span className="font-medium">{p.name}</span>
@@ -408,18 +446,6 @@ export default function Home() {
           </div>
         </main>
       </div>
-      <style>{`
-        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #1f2937; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #ec4899; border-radius: 20px; border: 3px solid #1f2937; }
-        @keyframes fade-in { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade-in { animation: fade-in 0.3s ease-out forwards; }
-        @keyframes jump-in { 0% { transform: scale(0.5) translateY(50px); opacity: 0; } 80% { transform: scale(1.1) translateY(-10px); opacity: 1; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
-        .animate-jump-in { animation: jump-in 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
-        @keyframes winner-text-anim { 0%, 100% { text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #fde047, 0 0 30px #fde047, 0 0 40px #fde047, 0 0 55px #fde047; } 50% { text-shadow: none; } }
-        .animate-winner-text { animation: winner-text-anim 2s infinite; }
-        @keyframes flutter { 0% { transform: rotateY(0) rotateX(0); } 100% { transform: rotateY(var(--flutter-rotate-y-end)) rotateX(var(--flutter-rotate-x-end)); } }
-      `}</style>
     </div>
   );
 }
