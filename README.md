@@ -32,7 +32,7 @@ Installation
 
     Clone the repository:
 
-    git clone https://github.com/YOUR_USERNAME/raffle-royale.git
+    git clone https://github.com/AmirGhiassian/raffle-royale.git
 
     Navigate to the project directory:
 
