@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Raffle Royale 👑
 
-## Getting Started
+Welcome to Raffle Royale, a fun, interactive, and visually stunning raffle application built with Next.js. This tool is perfect for giveaways, events, and any occasion where you need to pick a random winner in an exciting way!
 
-First, run the development server:
+Live Demo: Check it out in action at raffle.amirghiassian.com!
+✨ Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+    Dynamic Animations: Smooth, engaging animations for adding participants and revealing the winner.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+    Suspenseful Drum Roll: A drum roll sound effect plays while the raffle is in progress to build excitement.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+    Confetti Celebration: A beautiful, fluttering confetti explosion celebrates the lucky winner.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+    CSV Import: Easily add participants in bulk by uploading a simple CSV file (name,tickets).
 
-## Learn More
+    Weighted Entries: Assign multiple tickets to participants to increase their chances of winning.
 
-To learn more about Next.js, take a look at the following resources:
+    Sleek UI: A modern, dark-themed, and fully responsive user interface.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+🚀 Getting Started
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+To get a local copy up and running, follow these simple steps.
+Prerequisites
 
-## Deploy on Vercel
+You will need to have Node.js and pnpm installed on your machine.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+    Node.js
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+    pnpm
+
+Installation
+
+    Clone the repository:
+
+    git clone https://github.com/YOUR_USERNAME/raffle-royale.git
+
+    Navigate to the project directory:
+
+    cd raffle-royale
+
+    Install dependencies using pnpm:
+
+    pnpm install
+
+    Run the development server:
+
+    pnpm dev
+
+Now, open http://localhost:3000 in your browser to see the application.
+🤝 Contributing
+
+Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are greatly appreciated.
+
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
+
+    Fork the Project
+
+    Create your Feature Branch (git checkout -b feature/AmazingFeature)
+
+    Commit your Changes (git commit -m 'Add some AmazingFeature')
+
+    Push to the Branch (git push origin feature/AmazingFeature)
+
+    Open a Pull Request
+
+Don't forget to give the project a star if you like it! Thanks again!
+📜 License
+
+Distributed under the MIT License. See LICENSE for more information.
