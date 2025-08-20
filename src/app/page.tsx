@@ -1,5 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
+import confetti from "canvas-confetti";
+import Image from "next/image";
 
 // Define the types for our data structures
 type Participant = {
@@ -77,6 +79,8 @@ export default function Home() {
   const [shufflingName, setShufflingName] = useState("");
   const [showConfetti, setShowConfetti] = useState(false);
   const [confettiPieces, setConfettiPieces] = useState<ConfettiPieceData[]>([]);
+  const leftConfettiDiv = useRef<HTMLDivElement>(null);
+  const rightConfettiDiv = useRef<HTMLDivElement>(null);
 
   const winnerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -136,11 +140,54 @@ export default function Home() {
     newParticipants.splice(index, 1);
     setParticipants(newParticipants);
   };
+/* 
+// If you want to trigger confetti, move this logic inside a function after the winner is picked, e.g.:
+const triggerConfetti = () => {
+  confetti({
+    particleCount: 100,
+    spread: 100,
+    origin: { x: 0, y: 0 }, // top left corner
+    gravity: 0.5,
+    colors: ['#FF69B4', '#FFC67D', '#8BC34A'],
+    duration: 4000, // 4 seconds
+  });
+  confetti({
+    particleCount: 100,
+    spread: 100,
+    origin: { x: 1, y: 0 }, // top right corner
+    gravity: 0.5,
+    colors: ['#FF69B4', '#FFC67D', '#8BC34A'],
+    duration: 4000, // 4 seconds
+  });
+};
+*/
 
-  const startRaffle = async () => {
-    const Tone = (window as any).Tone;
-    if (
-      participants.length === 0 ||
+
+
+const triggerConfetti = () => {
+  confetti({
+    spread: 380,
+    particleCount: 1500,
+    angle: 45,
+    startVelocity: 100,
+    origin: { x: 0, y: 1},
+    gravity: 1.5,
+    colors: ['#FF69B4', '#FFC67D', '#8BC34A'],
+  });
+  confetti({
+    spread: 380,
+    particleCount: 1500,
+    angle: -45,
+    startVelocity: 100,
+    origin: { x: 1, y: 1 },
+    gravity: 1.5,
+    colors: ['#FF69B4', '#FFC67D', '#8BC34A'],
+  });
+};
+const startRaffle = async () => {
+  const Tone = (window as any).Tone;
+  if (
+    participants.length === 0 ||
       !drumSynth.current ||
       !winnerSynth.current ||
       !Tone
@@ -174,6 +221,7 @@ export default function Home() {
     let shuffleCount = 0;
     const maxShuffles = 30 + Math.floor(Math.random() * 15);
 
+
     const shuffleInterval = setInterval(() => {
       const randomIndex = Math.floor(Math.random() * allTickets.length);
       setShufflingName(allTickets[randomIndex]);
@@ -193,7 +241,9 @@ export default function Home() {
         setWinner(finalWinner);
         setShufflingName("");
         setIsRaffling(false);
-        triggerConfetti();
+
+triggerConfetti();
+
 
         const now = Tone.now();
         winnerSynth.current.triggerAttackRelease(["C4", "E4", "G4"], "8n", now);
@@ -211,36 +261,6 @@ export default function Home() {
     }, 120);
   };
 
-  const triggerConfetti = () => {
-    setShowConfetti(true);
-    const newPieces: ConfettiPieceData[] = Array.from({ length: 200 }).map(
-      () => ({
-        id: Math.random(),
-        x: Math.random() * window.innerWidth,
-        y: -20,
-        width: 8 + Math.random() * 8,
-        height: 5 + Math.random() * 5,
-        color: `hsl(${Math.random() * 360}, 90%, 60%)`,
-        animationDelay: Math.random() * 4,
-      }),
-    );
-    setConfettiPieces(newPieces);
-
-    setTimeout(() => {
-      setConfettiPieces((pieces) =>
-        pieces.map((p) => ({
-          ...p,
-          y: window.innerHeight + 20,
-          x: p.x + (Math.random() - 0.5) * 300,
-        })),
-      );
-    }, 100);
-
-    setTimeout(() => {
-      setShowConfetti(false);
-      setConfettiPieces([]);
-    }, 6000);
-  };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -281,21 +301,8 @@ export default function Home() {
 
   return (
     <div className="bg-gray-900 text-white min-h-screen font-sans p-4 sm:p-8 flex flex-col items-center">
-      {showConfetti && (
-        <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-50 overflow-hidden">
-          {confettiPieces.map((piece) => (
-            <ConfettiPiece
-              key={piece.id}
-              x={piece.x}
-              y={piece.y}
-              width={piece.width}
-              height={piece.height}
-              color={piece.color}
-              animationDelay={piece.animationDelay}
-            />
-          ))}
-        </div>
-      )}
+      <div ref={leftConfettiDiv} id="left-confetti-canvas" className="fixed top-0 left-0 w-1/2 h-full pointer-events-none z-50 overflow-hidden"></div>
+      <div ref={rightConfettiDiv} id="right-confetti-canvas" className="fixed top-0 right-0 w-1/2 h-full pointer-events-none z-50 overflow-hidden"></div>
 
       <div className="w-full max-w-2xl mx-auto">
         <header className="text-center mb-8">
@@ -426,6 +433,7 @@ export default function Home() {
               className="bg-gradient-to-r from-green-400 to-blue-500 text-white font-bold py-4 px-10 rounded-full text-xl hover:from-green-500 hover:to-blue-600 transition-all transform hover:scale-110 shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100"
             >
               {isRaffling ? "Picking..." : "Start Raffle!"}
+
             </button>
 
             <div className="mt-8 min-h-[100px] flex items-center justify-center">
@@ -439,6 +447,7 @@ export default function Home() {
                   <h3 className="text-xl text-gray-300">The winner is...</h3>
                   <p className="text-5xl sm:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-300 via-yellow-300 to-orange-400 mt-2 animate-winner-text">
                     {winner}!
+                                            <Image src="/ticket.png" alt="Raffle Royale Logo" width={300} height={300} className="mx-auto" />
                   </p>
                 </div>
               )}
