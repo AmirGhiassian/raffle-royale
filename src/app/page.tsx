@@ -447,7 +447,7 @@ triggerConfetti();
                   <h3 className="text-xl text-gray-300">The winner is...</h3>
                   <p className="text-5xl sm:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-300 via-yellow-300 to-orange-400 mt-2 animate-winner-text">
                     {winner}!
-                                            <Image src="/ticket.png" alt="Raffle Royale Logo" width={300} height={300} className="mx-auto" />
+                                            {/* <Image src="/ticket.png" alt="Raffle Royale Logo" width={300} height={300} className="mx-auto" /> */}
                   </p>
                 </div>
               )}
