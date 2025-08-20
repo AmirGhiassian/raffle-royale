@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-        title: "Raffle Royale",
+        title: "SCSC Raffle",
         description: "A free, open-source raffle app",
         icons: [
             {
@@ -22,6 +22,10 @@ export const metadata: Metadata = {
                 type: "image/x-icon"
             }
         ],
+        openGraph: {
+    title: 'SCSC Raffle',
+    description: 'A free, open-source raffle app',
+  }
 };
 
 export default function RootLayout({
