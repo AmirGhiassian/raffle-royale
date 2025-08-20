@@ -307,7 +307,7 @@ triggerConfetti();
       <div className="w-full max-w-2xl mx-auto">
         <header className="text-center mb-8">
           <h1 className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
-            Raffle Royale
+            SCSC Raffle
           </h1>
           <p className="text-gray-400 mt-2">Who will be the lucky winner?</p>
         </header>
